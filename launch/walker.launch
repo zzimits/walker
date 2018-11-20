@@ -1,0 +1,12 @@
+<launch>
+  
+  <arg name="record_chatter" default="false" />  
+		
+  <include file="$(find turtlebot_gazebo)/launch/turtlebot_world.launch">	
+  </include>
+  <node pkg="walker" name="controller" type="controller"/>
+  <node pkg="rosbag" type="record" name="rosbag_record_chatter"
+       args="record -a -O /home/viki/catkin_ws/src/beginner_tutorials/results/bagfile"
+       if="$(arg record_chatter)" />
+
+</launch>
