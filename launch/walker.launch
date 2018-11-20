@@ -6,7 +6,7 @@
   </include>
   <node pkg="walker" name="controller" type="controller"/>
   <node pkg="rosbag" type="record" name="rosbag_record_chatter"
-       args="record -a -O /home/viki/catkin_ws/src/beginner_tutorials/results/bagfile"
+       args="record -a -x /camera/(.*) -O $(find walker)/results/bagfile"
        if="$(arg record_chatter)" />
 
 </launch>
