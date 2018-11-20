@@ -27,6 +27,16 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+ * @file controller.cpp
+ * @author Zachary Zimits
+ * @copyright 2018 Zachary Zimits
+ * @brief Analsys laser scan data from turtle bot. 
+ *  When it gets to close to and object it stops and 
+ *  turns until the object is no longer visible then continues on.
+ *
+ */
+
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <sensor_msgs/LaserScan.h>
@@ -34,7 +44,34 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <algorithm>
 #include <iterator>
-#include "Listener.h"
+
+
+class Listener {
+public:
+  float closest;
+  
+  /**
+  * @brief                Finds the closest point in laser scan data
+  * @param scan           Initial value of orientation of type double
+  * @param closest        the closest point
+  */
+  void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan){
+    closest = 10; /*!<Closest point  */
+	std::vector<float>::iterator ptr;
+	std::vector<float> data = scan->ranges;
+	for (ptr=data.begin();ptr<data.end();ptr++){
+	  if (*ptr<closest)
+	    closest=*ptr;
+	}  
+  }
+  /**
+  * @brief                Returns the closest point to the main function
+  * @return closest       The closest point from scan data
+  */
+  float getClosest(){
+	  return closest;
+  }
+};
 
 int main(int argc, char **argv)
 {
@@ -47,8 +84,8 @@ int main(int argc, char **argv)
   ros::Rate rate (10);
   Listener listener;
 	
-  geometry_msgs::Twist driveMsg;
-  geometry_msgs::Twist turnMsg;
+  geometry_msgs::Twist driveMsg; /*!<msg that contains drive data  */
+  geometry_msgs::Twist turnMsg; /*!<msg that contains turn data  */
   driveMsg.linear.x = 0.2;
   turnMsg.angular.z=1;
 	
