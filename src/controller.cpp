@@ -47,64 +47,62 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 class Listener {
-public:
+ public:
   float closest;
-  
+
   /**
   * @brief                Finds the closest point in laser scan data
   * @param scan           Initial value of orientation of type double
   * @param closest        the closest point
   */
-  void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan){
+  void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan) {
     closest = 10; /*!<Closest point  */
-	std::vector<float>::iterator ptr;
-	std::vector<float> data = scan->ranges;
-	for (ptr=data.begin();ptr<data.end();ptr++){
-	  if (*ptr<closest)
-	    closest=*ptr;
-	}  
+    std::vector<float>::iterator ptr;
+    std::vector<float> data = scan->ranges;
+    for (ptr = data.begin(); ptr < data.end(); ptr++) {
+      if (*ptr < closest)
+        closest = *ptr;
+    }
   }
   /**
   * @brief                Returns the closest point to the main function
   * @return closest       The closest point from scan data
   */
   float getClosest(){
-	  return closest;
+      return closest;
   }
 };
 
-int main(int argc, char **argv)
-{
-
+int main(int argc, char **argv) {
   ros::init(argc, argv, "listener");
   ros::NodeHandle n;
   ros::NodeHandle nh;
   ros::Subscriber scanSub;
   ros::Publisher velPub;
-  ros::Rate rate (10);
+  ros::Rate rate(10);
   Listener listener;
-	
+
   geometry_msgs::Twist driveMsg; /*!<msg that contains drive data  */
   geometry_msgs::Twist turnMsg; /*!<msg that contains turn data  */
   driveMsg.linear.x = 0.2;
-  turnMsg.angular.z=1;
-	
-	
-  velPub = nh.advertise<geometry_msgs::Twist>("mobile_base/commands/velocity",10);
-  scanSub=nh.subscribe<sensor_msgs::LaserScan>("/scan",10,&Listener::processLaserScan, &listener);
-  
-  while (ros::ok()){
+  turnMsg.angular.z = 1;
+
+  velPub = nh.advertise<geometry_msgs::Twist>
+      ("mobile_base/commands/velocity", 10);
+  scanSub = nh.subscribe<sensor_msgs::LaserScan>
+      ("/scan", 10, &Listener::processLaserScan, &listener);
+
+  while (ros::ok()) {
     ros::spinOnce();
-	
-    if(listener.getClosest()<0.8) {
-		ROS_DEBUG_STREAM("Turn: "<<listener.getClosest());
-		velPub.publish(turnMsg);
-	} else {
-		ROS_DEBUG_STREAM("Drive: "<<listener.getClosest());
-		velPub.publish(driveMsg);
-	rate.sleep();
-  
-	}
+
+    if (listener.getClosest() < 0.8) {
+        ROS_DEBUG_STREAM("Turn: " << listener.getClosest());
+        velPub.publish(turnMsg);
+    } else {
+        ROS_DEBUG_STREAM("Drive: " << listener.getClosest());
+        velPub.publish(driveMsg);
+    rate.sleep();
+    }
   }
   return 0;
 }
