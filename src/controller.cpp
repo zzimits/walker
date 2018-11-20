@@ -9,10 +9,15 @@
 class Listener {
 public:
   float closest;
-
   void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan){
-    std::vector<float> data = scan->ranges;
-    closest = *std::min_element(data.begin(),data.end());
+	closest = 10;
+	std::vector<float>::iterator ptr;
+	std::vector<float> data = scan->ranges;
+	for (ptr=data.begin();ptr<data.end();ptr++){
+		if (*ptr<closest)
+			closest=*ptr;
+	}  
+	  //closest = *std::min_element(data.begin(),data.end());
   }
 	
   float getClosest(){
@@ -43,7 +48,7 @@ int main(int argc, char **argv)
   while (ros::ok()){
     ros::spinOnce();
 	
-    if(listener.getClosest()<0.5) {
+    if(listener.getClosest()<0.8) {
 		ROS_INFO_STREAM("Turn: "<<listener.getClosest());
 		velPub.publish(turnMsg);
 	} else {
