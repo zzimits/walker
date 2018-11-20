@@ -96,10 +96,10 @@ int main(int argc, char **argv) {
     ros::spinOnce();
 
     if (listener.getClosest() < 0.8) {
-        ROS_DEBUG_STREAM("Turn: " << listener.getClosest());
+        ROS_INFO_STREAM("Turn: " << listener.getClosest());
         velPub.publish(turnMsg);
     } else {
-        ROS_DEBUG_STREAM("Drive: " << listener.getClosest());
+        ROS_INFO_STREAM("Drive: " << listener.getClosest());
         velPub.publish(driveMsg);
     rate.sleep();
     }
